@@ -8,6 +8,11 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db 
+  basketdb:
+    container_name: basketdb
+    restart: always
+    ports:
+      - "6379:6379"
   catalog.api:  
     container_name: catalog.api
     environment:
@@ -23,16 +28,13 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - "CacheSettings:ConnectionString=basketdb:6379"
+      - "GrpcSettings:DiscountUrl=http://discount.grpc"
     depends_on:
       - basketdb
     ports:
       - "8001:80"
-
-  basketdb:
-    container_name: basketdb
-    restart: always
-    ports:
-      - "6379:6379"
+ 
+  
   discountdb:
     container_name: discountdb
     environment:
@@ -41,13 +43,13 @@ services:
       - POSTGRES_DB=DiscountDb
     restart: always
     ports:
-      - "5432:5432"
+        - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data/ 
+      - postgres_data:/var/lib/postgresql/data/
   pgadmin:
     container_name: pgadmin
     environment:
-      - PGADMIN_DEFAULT_EMAIL=  
+      - PGADMIN_DEFAULT_EMAIL=admin@aspnetrun.com 
       - PGADMIN_DEFAULT_PASSWORD=admin1234
     restart: always
     ports: 
@@ -63,16 +65,28 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
-    
-
-
   discount.api:
     container_name: discount.api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - DatabaseSettings:ConnectionString=Server=dicountdb;Port=5432;Database=DiscountDb;User Id=admin;Password=admin1234
+      - "DatabaseSettings:ConnectionString=Host=discountdb;SSL Mode=Prefer;Port=5432;Database=DiscountDb;User Id=admin;Password=admin1234;"
     depends_on:
       - discountdb
     ports:
       - "8002:80"
+
+
+
+  
+
+
+  discount.grpc:
+    container_name: discount.grpc
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - "DatabaseSettings:ConnectionString=Host=discountdb;SSL Mode=Prefer;Port=5432;Database=DiscountDb;User Id=admin;Password=admin1234;"
+    depends_on:
+      - discountdb
+    ports:
+      - "8003:80"
 

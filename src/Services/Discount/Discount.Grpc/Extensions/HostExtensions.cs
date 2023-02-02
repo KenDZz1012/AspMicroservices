@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Npgsql;
 using System;
 
-namespace Catalog.API.Entities.Extensions
+namespace Discount.Grpc.Extensions
 {
     public static class HostExtensions
     {
@@ -20,7 +20,7 @@ namespace Catalog.API.Entities.Extensions
                 try
                 {
                     logger.LogInformation("Migrating postresql database.");
-
+                    logger.LogInformation(configuration.GetValue<string>("DatabaseSettings:ConnectionString"));
                     using var connection = new NpgsqlConnection
                         (configuration.GetValue<string>("DatabaseSettings:ConnectionString"));
                     connection.Open();
