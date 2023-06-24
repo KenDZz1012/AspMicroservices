@@ -19,3 +19,4 @@ namespace Ordering.Domain.Common
         public DateTime? LastModifiedDate { get; set; }
     }
 }
+    
